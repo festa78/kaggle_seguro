@@ -99,7 +99,7 @@ gini_scorer = metrics.make_scorer(normalized_gini, greater_is_better = True)
 xgb0 = xgb.XGBRegressor(max_depth=10,
                         learning_rate=0.001,
                         n_estimators=1000,
-                        n_jobs=5,
+                        # n_jobs=5,
                         objective="reg:logistic",
                         gamma=0,
                         min_child_weight=1,
@@ -118,16 +118,16 @@ predict_submit.to_csv('./xgb0_submission.csv', index=False)   #LB0.269
 param_test1 = {
     'max_depth':range(3,10,1),
     'min_child_weight':range(1,6,1),
-    'subsample':[i/10.0 for i in range(6,10)],
-    'colsample_bytree':[i/10.0 for i in range(6,10)],
-    'gamma':[i/10.0 for i in range(0,5)],
+    'subsample':[i/100.0 for i in range(6,100,5)],
+    'colsample_bytree':[i/100.0 for i in range(20,100)],
+    'gamma':[i/100.0 for i in range(0,100,5)],
     'reg_alpha':[1e-5, 1e-4, 1e-3, 1e-2, 0.1, 1, 10, 100]
 }
 
 gsearch1 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=3,
                                                    learning_rate=0.001,
                                                    n_estimators=1000,
-                                                   n_jobs=2,
+                                                   # n_jobs=2,
                                                    gamma=0,
                                                    objective='reg:logistic',
                                                    min_child_weight=1,
@@ -136,10 +136,17 @@ gsearch1 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=3,
                                                    scale_pos_weight=1,
                                                    seed=27),
                         param_grid=param_test1,
+                        verbose=2,
                         # scoring=gini_scorer,
-                        n_jobs=2,
+                        # n_jobs=2,
                         iid=False,
                         cv=5)
 gsearch1.fit(train_df_norm, train_y)
 
 print(gsearch1.grid_scores_, gsearch1.best_params_, gsearch1.best_score_)
+
+predict_y = gsearch1.predict(test_df_norm)
+predict_y[predict_y> 1.] = 1.
+predict_y[predict_y< 0.] = 0.
+predict_submit = pd.concat((test_id, pd.DataFrame(data=predict_y, columns=['target'])), axis=1)
+predict_submit.to_csv('./gsearch1_once_submission.csv', index=False)   #LB

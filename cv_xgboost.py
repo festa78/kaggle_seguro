@@ -124,7 +124,7 @@ gini_scorer = metrics.make_scorer(normalized_gini, greater_is_better = True)
 xgb0 = xgb.XGBRegressor(max_depth=3,
                         learning_rate=0.1,
                         n_estimators=100,
-                        n_jobs=4,
+                        # n_jobs=4,
                         objective='reg:linear',
                         gamma=0,
                         min_child_weight=1,
@@ -149,13 +149,13 @@ predict_submit.to_csv('./xgb0_submission.csv', index=False)   #LB0.269
 # Grid seach on subsample and max_features
 param_test1 = {
     'max_depth':range(3,10,1),
-    'min_child_weight':range(1,6,1)
+    'min_child_weight':range(2,6,1)
 }
 
 gsearch1 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=3,
                                                    learning_rate=0.1,
                                                    n_estimators=100,
-                                                   n_jobs=4,
+                                                   # n_jobs=4,
                                                    gamma=0,
                                                    objective='reg:linear',
                                                    min_child_weight=1,
@@ -164,8 +164,9 @@ gsearch1 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=3,
                                                    scale_pos_weight=1,
                                                    seed=27),
                         param_grid=param_test1,
+                        verbose=2,
                         # scoring=gini_scorer,
-                        n_jobs=2,
+                        # n_jobs=2,
                         iid=False,
                         cv=5)
 gsearch1.fit(train_df_norm, train_y)
@@ -176,7 +177,7 @@ predict_y = gsearch1.predict(test_df_norm)
 predict_y[predict_y> 1.] = 1.
 predict_y[predict_y< 0.] = 0.
 predict_submit = pd.concat((test_id, pd.DataFrame(data=predict_y, columns=['target'])), axis=1)
-predict_submit.to_csv('./gsearch1_submission.csv', index=False)   #LB0.261
+predict_submit.to_csv('./gsearch1_submission.csv', index=False)   #LB0.271
 
 #Grid seach on gamma
 param_test2 = {
@@ -186,7 +187,7 @@ param_test2 = {
 gsearch2 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=gsearch1.best_params_['max_depth'],
                                                    learning_rate=0.1,
                                                    n_estimators=100,
-                                                   n_jobs=4,
+                                                   # n_jobs=4,
                                                    gamma=0,
                                                    objective='reg:linear',
                                                    min_child_weight=gsearch1.best_params_['min_child_weight'],
@@ -195,8 +196,9 @@ gsearch2 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=gsearch1.best_param
                                                    scale_pos_weight=1,
                                                    seed=27),
                         param_grid=param_test2,
+                        verbose=2,
                         # scoring=gini_scorer,
-                        n_jobs=2,
+                        # n_jobs=2,
                         iid=False,
                         cv=5)
 gsearch2.fit(train_df_norm, train_y)
@@ -207,7 +209,7 @@ predict_y = gsearch2.predict(test_df_norm)
 predict_y[predict_y> 1.] = 1.
 predict_y[predict_y< 0.] = 0.
 predict_submit = pd.concat((test_id, pd.DataFrame(data=predict_y, columns=['target'])), axis=1)
-predict_submit.to_csv('./gsearch2_submission.csv', index=False)   #LB0.261
+predict_submit.to_csv('./gsearch2_submission.csv', index=False)   #LB0.272
 
 # recalculate boosting round
 # xgb2 = xgb.XGBRegressor(max_depth=gsearch1.best_params_['max_depth'],
@@ -233,7 +235,7 @@ param_test3 = {
 gsearch3 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=gsearch1.best_params_['max_depth'],
                                                    learning_rate=0.1,
                                                    n_estimators=100,
-                                                   n_jobs=4,
+                                                   # n_jobs=4,
                                                    gamma=gsearch2.best_params_['gamma'],
                                                    min_child_weight=gsearch1.best_params_['min_child_weight'],
                                                    objective='reg:linear',
@@ -242,8 +244,9 @@ gsearch3 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=gsearch1.best_param
                                                    scale_pos_weight=1,
                                                    seed=27),
                         param_grid=param_test3,
+                        verbose=2,
                         # scoring=gini_scorer,
-                        n_jobs=2,
+                        # n_jobs=2,
                         iid=False,
                         cv=5)
 gsearch3.fit(train_df_norm, train_y)
@@ -254,7 +257,7 @@ predict_y = gsearch3.predict(test_df_norm)
 predict_y[predict_y> 1.] = 1.
 predict_y[predict_y< 0.] = 0.
 predict_submit = pd.concat((test_id, pd.DataFrame(data=predict_y, columns=['target'])), axis=1)
-predict_submit.to_csv('./gsearch3_submission.csv', index=False)   #LB0.244
+predict_submit.to_csv('./gsearch3_submission.csv', index=False)   #LB
 
 #Grid seach on reg_alpha
 param_test4 = {
@@ -264,7 +267,7 @@ param_test4 = {
 gsearch4 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=gsearch1.best_params_['max_depth'],
                                                    learning_rate=0.1,
                                                    n_estimators=100,
-                                                   n_jobs=4,
+                                                   # n_jobs=4,
                                                    gamma=gsearch2.best_params_['gamma'],
                                                    min_child_weight=gsearch1.best_params_['min_child_weight'],
                                                    objective='reg:linear',
@@ -274,8 +277,9 @@ gsearch4 = GridSearchCV(estimator=xgb.XGBRegressor(max_depth=gsearch1.best_param
                                                    reg_alpha=0.005,
                                                    seed=27),
                         param_grid=param_test4,
+                        verbose=2,
                         # scoring=gini_scorer,
-                        n_jobs=2,
+                        # n_jobs=2,
                         iid=False,
                         cv=5)
 gsearch4.fit(train_df_norm, train_y)
@@ -286,7 +290,7 @@ predict_y = gsearch4.predict(test_df_norm)
 predict_y[predict_y> 1.] = 1.
 predict_y[predict_y< 0.] = 0.
 predict_submit = pd.concat((test_id, pd.DataFrame(data=predict_y, columns=['target'])), axis=1)
-predict_submit.to_csv('./gsearch4_submission.csv', index=False)   #LB0.244
+predict_submit.to_csv('./gsearch4_submission.csv', index=False)   #LB
 
 # recalculate boosting round
 # xgb3= xgb.XGBRegressor(max_depth=gsearch1.best_params_['max_depth'],
@@ -309,7 +313,7 @@ predict_submit.to_csv('./gsearch4_submission.csv', index=False)   #LB0.244
 xgb4= xgb.XGBRegressor(max_depth=gsearch1.best_params_['max_depth'],
                        learning_rate=0.001,
                        n_estimators=5000,
-                       n_jobs=4,
+                       # n_jobs=4,
                        gamma=gsearch2.best_params_['gamma'],
                        min_child_weight=gsearch1.best_params_['min_child_weight'],
                        objective='reg:linear',
@@ -326,4 +330,4 @@ predict_y = xgb4.predict(test_df_norm)
 predict_y[predict_y> 1.] = 1.
 predict_y[predict_y< 0.] = 0.
 predict_submit = pd.concat((test_id, pd.DataFrame(data=predict_y, columns=['target'])), axis=1)
-predict_submit.to_csv('./xgb4_submission.csv', index=False)   #LB0.236
+predict_submit.to_csv('./xgb4_submission.csv', index=False)   #LB
