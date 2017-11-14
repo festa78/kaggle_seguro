@@ -96,17 +96,17 @@ def normalized_gini(solution, submission):
 gini_scorer = metrics.make_scorer(normalized_gini, greater_is_better = True)
 
 # lightgbm
-param_test2 = [
+param_test2 = {
     "max_bin":range(20, 10000, 100),
-    "learning_rate":range(0.001, 0.3, 0.005),
+    "learning_rate":[i/1000. for i in range(1, 300, 5)],
     "num_leaves":range(100, 4095, 100),
     "scale_pos_weight":[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1., 5., 10., 50., 100., 500],
     "n_estimators":[10, 50, 100, 500, 1000, 3000, 5000],
     "min_child_weight": [1, 10, 100, 500, 1000, 2000],
-    "subsample": range(0.4, 1, 0.1),
-    "bagging_fraction": range(0.3, 1, 0.1),
+    "subsample": [i/10. for i in range(4, 10, 1)],
+    "bagging_fraction": [i/10. for i in range(3, 10, 1)],
     "max_depth":range(2, 40, 4),
-]
+}
 
 # param_test2 = {
 #     'max_depth':range(3,10,1),
